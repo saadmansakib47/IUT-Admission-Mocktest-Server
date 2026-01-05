@@ -1,13 +1,12 @@
-import express from "express"
-import cors from "cors"
+import express from "express";
+import cookieParser from "cookie-parser";
+import authRoutes from "./routes/auth.routes.js";
 
-const app = express()
+const app = express();
 
-app.use(cors())
-app.use(express.json())
+app.use(express.json());
+app.use(cookieParser());
 
-app.get("/health", (_, res) => {
-    res.json({ status: "OK" })
-})
+app.use("/api/auth", authRoutes);
 
-export default app
+export default app;
