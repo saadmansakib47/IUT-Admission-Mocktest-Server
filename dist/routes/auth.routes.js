@@ -16,4 +16,3 @@ router.post("/forgot-password", authRateLimiter, forgotPassword);
 router.post("/refresh", refresh);
 router.post("/logout", logout);
 export default router;
-//# sourceMappingURL=auth.routes.js.map

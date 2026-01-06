@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 const UserSchema = new Schema({
     username: {
         type: String,
@@ -33,4 +33,3 @@ const UserSchema = new Schema({
     lastLoginAt: Date,
 }, { timestamps: true });
 export const User = mongoose.model("User", UserSchema);
-//# sourceMappingURL=User.js.map

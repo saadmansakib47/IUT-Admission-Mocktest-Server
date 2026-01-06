@@ -8,4 +8,3 @@ export const authRateLimiter = rateLimit({
         error: "Too many attempts. Please try again after a minute.",
     },
 });
-//# sourceMappingURL=rateLimit.middleware.js.map

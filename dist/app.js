@@ -6,4 +6,3 @@ app.use(express.json());
 app.use(cookieParser());
 app.use("/api/auth", authRoutes);
 export default app;
-//# sourceMappingURL=app.js.map

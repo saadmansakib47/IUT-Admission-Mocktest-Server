@@ -68,4 +68,3 @@ export const createResetToken = async (email) => {
     await user.save();
     return token;
 };
-//# sourceMappingURL=auth.service.js.map

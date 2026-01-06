@@ -46,4 +46,3 @@ export const forgotPassword = async (req, res) => {
     await AuthService.createResetToken(email.toLowerCase());
     res.sendStatus(200);
 };
-//# sourceMappingURL=auth.controller.js.map
