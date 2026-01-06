@@ -7,8 +7,8 @@ import {
     forgotPassword,
 } from "../controllers/auth.controller.js";
 
-// (Optional) rate limiter middleware
-// import { authRateLimiter } from "../middlewares/rateLimit.middleware.js";
+// rate limiter middleware
+import { authRateLimiter } from "../middlewares/rateLimit.middleware.js";
 
 const router = Router();
 
@@ -16,14 +16,14 @@ const router = Router();
  * Rate-limited routes
  * 5 attempts / minute / IP
  */
-// router.post("/signup", authRateLimiter, signup);
-router.post("/signup", signup);
+router.post("/signup", authRateLimiter, signup);
 
-// router.post("/signin", authRateLimiter, signin);
-router.post("/signin", signin);
 
-// router.post("/forgot-password", authRateLimiter, forgotPassword);
-router.post("/forgot-password", forgotPassword);
+router.post("/signin", authRateLimiter, signin);
+
+
+router.post("/forgot-password", authRateLimiter, forgotPassword);
+
 
 /**
  * Non-rate-limited routes
