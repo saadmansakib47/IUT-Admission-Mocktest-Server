@@ -8,7 +8,9 @@
     "module": "nodenext",
     "moduleResolution": "NodeNext",
     "target": "ES2020",
-    "types": [],
+    "types": [
+      "node"
+    ],
     // For nodejs:
     // "lib": ["esnext"],
     // "types": ["node"],
