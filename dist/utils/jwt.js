@@ -16,3 +16,12 @@ export const verifyAccessToken = (token) => {
 export const verifyRefreshToken = (token) => {
     return jwt.verify(token, env.JWT_REFRESH_SECRET);
 };
+export const generateTokens = (user) => {
+    const payload = {
+        userId: user._id.toString(),
+        role: user.role,
+    };
+    const accessToken = signAccessToken(payload);
+    const refreshToken = signRefreshToken(payload);
+    return { accessToken, refreshToken };
+};

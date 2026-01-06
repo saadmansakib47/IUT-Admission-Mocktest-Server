@@ -6,6 +6,8 @@ import {
     logout,
     forgotPassword,
 } from "../controllers/auth.controller.js";
+import passport from "../config/passport.js";
+import { googleOAuthCallback } from "../controllers/auth.controller.js";
 
 // rate limiter middleware
 import { RateLimiter } from "../middlewares/rateLimit.middleware.js";
@@ -32,3 +34,16 @@ router.post("/refresh", refresh);
 router.post("/logout", logout);
 
 export default router;
+
+
+router.get(
+    "/google",
+    passport.authenticate("google", { scope: ["profile", "email"] })
+);
+
+router.get(
+    "/google/callback",
+    passport.authenticate("google", { session: false }),
+    googleOAuthCallback
+);
+

@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import * as AuthService from "../services/auth.service.js";
 import { verifyRefreshToken } from "../utils/jwt.js";
+import { generateTokens } from "../utils/jwt.js";
 
 const cookieOptions = {
     httpOnly: true,
@@ -47,6 +48,31 @@ export const signin = async (req: Request, res: Response) => {
         .json({ message: "Signin successful" });
 };
 
+
+export const googleOAuthCallback = async (req: Request, res: Response) => {
+    try {
+        const user = req.user as any; // passport attaches user here
+
+        // generate tokens
+        const { accessToken, refreshToken } = generateTokens(user);
+
+        // save refreshToken hash
+        user.refreshTokenHash = refreshToken; // or hash it like in standard signup
+        await user.save();
+
+        // set cookies
+        res.cookie("accessToken", accessToken, { httpOnly: true, secure: true, sameSite: "none" });
+        res.cookie("refreshToken", refreshToken, { httpOnly: true, secure: true, sameSite: "none" });
+
+        // redirect to frontend
+        res.redirect(`${process.env.FRONTEND_URL}/dashboard`);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Google OAuth failed" });
+    }
+};
+
+
 export const refresh = async (req: Request, res: Response) => {
     const refreshToken = req.cookies.refreshToken;
     if (!refreshToken) return res.sendStatus(401);
@@ -63,7 +89,12 @@ export const refresh = async (req: Request, res: Response) => {
 
 export const logout = async (req: Request, res: Response) => {
     if (req.user) {
-        await AuthService.logoutUser(req.user.userId);
+        const user = req.user as any;
+        const userId = user.userId || user._id?.toString();
+
+        if (userId) {
+            await AuthService.logoutUser(userId);
+        }
     }
 
     res
@@ -72,8 +103,10 @@ export const logout = async (req: Request, res: Response) => {
         .sendStatus(200);
 };
 
+
 export const forgotPassword = async (req: Request, res: Response) => {
     const { email } = req.body;
     await AuthService.createResetToken(email.toLowerCase());
     res.sendStatus(200);
 };
+

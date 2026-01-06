@@ -25,3 +25,16 @@ export const verifyAccessToken = (token: string) => {
 export const verifyRefreshToken = (token: string) => {
     return jwt.verify(token, env.JWT_REFRESH_SECRET) as JwtPayload;
 };
+
+export const generateTokens = (user: { _id: any; role: string }) => {
+    const payload = {
+        userId: user._id.toString(),
+        role: user.role as "student" | "admin",
+    };
+
+    const accessToken = signAccessToken(payload);
+    const refreshToken = signRefreshToken(payload);
+
+    return { accessToken, refreshToken };
+};
+
