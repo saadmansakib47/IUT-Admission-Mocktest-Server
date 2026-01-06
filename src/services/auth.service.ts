@@ -6,7 +6,6 @@ import { signAccessToken, signRefreshToken } from "../utils/jwt.js";
 const SALT_ROUNDS = 12;
 
 export const createUser = async (
-    username: string,
     email: string,
     password: string
 ) => {
@@ -18,7 +17,6 @@ export const createUser = async (
     const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
 
     const user = await User.create({
-        username,
         email,
         passwordHash,
     });

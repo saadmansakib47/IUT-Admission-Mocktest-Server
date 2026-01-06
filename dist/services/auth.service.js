@@ -3,14 +3,13 @@ import crypto from "crypto";
 import { User } from "../models/User.js";
 import { signAccessToken, signRefreshToken } from "../utils/jwt.js";
 const SALT_ROUNDS = 12;
-export const createUser = async (username, email, password) => {
+export const createUser = async (email, password) => {
     const existing = await User.findOne({ email });
     if (existing) {
         throw new Error("Email already in use");
     }
     const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
     const user = await User.create({
-        username,
         email,
         passwordHash,
     });

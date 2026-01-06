@@ -9,10 +9,9 @@ const cookieOptions = {
 };
 
 export const signup = async (req: Request, res: Response) => {
-    const { username, email, password } = req.body;
+    const { email, password } = req.body;
 
     const user = await AuthService.createUser(
-        username.trim(),
         email.toLowerCase(),
         password
     );

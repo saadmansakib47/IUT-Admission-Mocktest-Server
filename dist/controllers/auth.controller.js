@@ -6,8 +6,8 @@ const cookieOptions = {
     sameSite: "lax",
 };
 export const signup = async (req, res) => {
-    const { username, email, password } = req.body;
-    const user = await AuthService.createUser(username.trim(), email.toLowerCase(), password);
+    const { email, password } = req.body;
+    const user = await AuthService.createUser(email.toLowerCase(), password);
     const { accessToken, refreshToken } = await AuthService.generateTokens(user.id, user.role);
     res
         .cookie("accessToken", accessToken, cookieOptions)
