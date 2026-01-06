@@ -9,3 +9,13 @@ export const authRateLimiter = rateLimit({
         error: "Too many attempts. Please try again after a minute.",
     },
 });
+
+export const contactRateLimiter = rateLimit({
+    windowMs: 60 * 1000, // 1 minute
+    max: 3, // 3 requests per IP per window
+    standardHeaders: true, // Return rate limit info in headers
+    legacyHeaders: false,
+    message: {
+        error: "Too many attempts. Please try again after a minute.",
+    },
+});
