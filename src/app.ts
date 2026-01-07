@@ -3,11 +3,11 @@ import cookieParser from "cookie-parser";
 import authRoutes from "./routes/auth.routes.js";
 import contactRoutes from "./routes/contact.routes.js";
 import passport from "passport";
+import cors from "cors";
 
-
-const cors = require('cors');
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 
