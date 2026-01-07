@@ -17,6 +17,6 @@ router.post("/forgot-password", RateLimiter, forgotPassword);
  */
 router.post("/refresh", refresh);
 router.post("/logout", logout);
-export default router;
 router.get("/google", passport.authenticate("google", { scope: ["profile", "email"] }));
 router.get("/google/callback", passport.authenticate("google", { session: false }), googleOAuthCallback);
+export default router;

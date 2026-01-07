@@ -70,6 +70,8 @@ export const googleOAuthCallback = async (req: Request, res: Response) => {
         console.error(err);
         res.status(500).json({ message: "Google OAuth failed" });
     }
+
+
 };
 
 
