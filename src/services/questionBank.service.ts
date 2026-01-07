@@ -1,4 +1,4 @@
-import { QuestionBank } from "../models/QuestionBank";
+import { QuestionBank } from "../models/QuestionBank.js";
 
 
 export const getQuestionBanks = async (type?: string, subject?: string) => {

@@ -13,3 +13,5 @@ const QuestionSchema = new Schema(
     },
     { timestamps: true }
 );
+
+export const Question = model("Question", QuestionSchema);

@@ -1,51 +1,36 @@
 import { Question } from "../models/Question.js";
 import { TestSession } from "../models/TestSession.js";
 import { QuestionBank } from "../models/QuestionBank.js";
-
-
-export const startTest = async (userId: string | null, questionBankId: string) => {
+export const startTest = async (userId, questionBankId) => {
     const bank = await QuestionBank.findById(questionBankId);
-    if (!bank) throw new Error("Question bank not found");
-
-
+    if (!bank)
+        throw new Error("Question bank not found");
     const questions = await Question.aggregate([
         { $match: { source: bank.type } },
         { $sample: { size: bank.totalQuestions } }
     ]);
-
-
     const now = new Date();
     const endsAt = new Date(now.getTime() + bank.duration * 60 * 1000);
-
-
     const session = await TestSession.create({
         userId: userId || undefined,
         questionBankId,
-        questions: questions.map((q: any) => ({ questionId: q._id })),
+        questions: questions.map((q) => ({ questionId: q._id })),
         startedAt: now,
         endsAt
     });
-
-
     return { session, questions };
 };
-
-
-export const submitTest = async (sessionId: string) => {
+export const submitTest = async (sessionId) => {
     const session = await TestSession.findById(sessionId).populate("questions.questionId");
-    if (!session || session.submittedAt) throw new Error("Invalid session");
-
-
+    if (!session || session.submittedAt)
+        throw new Error("Invalid session");
     let score = 0;
-    session.questions.forEach((q: any) => {
-        if (q.selectedAnswer === q.questionId.correctAnswer) score++;
+    session.questions.forEach((q) => {
+        if (q.selectedAnswer === q.questionId.correctAnswer)
+            score++;
     });
-
-
     session.score = score;
     session.submittedAt = new Date();
     await session.save();
-
-
     return score;
 };
