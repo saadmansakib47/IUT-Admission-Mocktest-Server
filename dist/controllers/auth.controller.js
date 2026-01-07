@@ -1,6 +1,5 @@
 import * as AuthService from "../services/auth.service.js";
 import { verifyRefreshToken } from "../utils/jwt.js";
-import { generateTokens } from "../utils/jwt.js";
 const cookieOptions = {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
@@ -27,20 +26,27 @@ export const signin = async (req, res) => {
 };
 export const googleOAuthCallback = async (req, res) => {
     try {
-        const user = req.user; // passport attaches user here
-        // generate tokens
-        const { accessToken, refreshToken } = generateTokens(user);
-        // save refreshToken hash
-        user.refreshTokenHash = refreshToken; // or hash it like in standard signup
-        await user.save();
+        if (!req.user) {
+            console.error("Google OAuth Error: req.user is undefined");
+            return res.status(401).json({ message: "Authentication failed" });
+        }
+        const user = req.user;
+        const userId = user._id?.toString() || user.userId;
+        if (!userId) {
+            console.error("Google OAuth Error: User ID not found in req.user", req.user);
+            return res.status(401).json({ message: "Authentication failed" });
+        }
+        // Use AuthService.generateTokens for consistency (hashes refreshToken in DB)
+        const { accessToken, refreshToken } = await AuthService.generateTokens(userId, user.role || "student");
         // set cookies
-        res.cookie("accessToken", accessToken, { httpOnly: true, secure: true, sameSite: "none" });
-        res.cookie("refreshToken", refreshToken, { httpOnly: true, secure: true, sameSite: "none" });
+        res.cookie("accessToken", accessToken, { ...cookieOptions, sameSite: "none", secure: true });
+        res.cookie("refreshToken", refreshToken, { ...cookieOptions, sameSite: "none", secure: true });
         // redirect to frontend
-        res.redirect(`${process.env.FRONTEND_URL}/dashboard`);
+        const redirectUrl = process.env.FRONTEND_URL ? `${process.env.FRONTEND_URL}/dashboard` : "http://localhost:3000/dashboard";
+        res.redirect(redirectUrl);
     }
     catch (err) {
-        console.error(err);
+        console.error("Google OAuth Callback Error:", err);
         res.status(500).json({ message: "Google OAuth failed" });
     }
 };

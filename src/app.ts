@@ -4,6 +4,8 @@ import authRoutes from "./routes/auth.routes.js";
 import contactRoutes from "./routes/contact.routes.js";
 import passport from "passport";
 import cors from "cors";
+import { testRouter } from "./routes/test.routes.js";
+import { questionBankRouter } from "./routes/questionBank.routes.js";
 
 // CORS configuration
 const corsOptions = {
@@ -16,6 +18,8 @@ const corsOptions = {
 
 const app = express();
 
+app.set("trust proxy", 1);
+
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
@@ -23,5 +27,7 @@ app.use(cookieParser());
 app.use(passport.initialize());
 app.use("/api/auth", authRoutes);
 app.use("/api/contact", contactRoutes);
+app.use("/api/question-banks", questionBankRouter);
+app.use("/api/tests", testRouter);
 
 export default app;
