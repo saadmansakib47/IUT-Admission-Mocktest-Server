@@ -1,3 +1,4 @@
+//QuestionBank model
 import { Schema, model } from "mongoose";
 const QuestionBankSchema = new Schema({
     title: { type: String, required: true },

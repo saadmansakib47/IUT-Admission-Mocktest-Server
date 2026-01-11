@@ -5,6 +5,17 @@ export const startTest = async (userId, questionBankId) => {
     const bank = await QuestionBank.findById(questionBankId);
     if (!bank)
         throw new Error("Question bank not found");
+    // One active test per bank per user (authenticated users only)
+    if (userId) {
+        const activeSession = await TestSession.findOne({
+            userId,
+            questionBankId,
+            submittedAt: { $exists: false }
+        });
+        if (activeSession) {
+            throw new Error("Active test already exists for this question bank");
+        }
+    }
     const questions = await Question.aggregate([
         { $match: { source: bank.type } },
         { $sample: { size: bank.totalQuestions } }
@@ -14,7 +25,7 @@ export const startTest = async (userId, questionBankId) => {
     const session = await TestSession.create({
         userId: userId || undefined,
         questionBankId,
-        questions: questions.map((q) => ({ questionId: q._id })),
+        questions: questions.map(q => ({ questionId: q._id })),
         startedAt: now,
         endsAt
     });
