@@ -3,8 +3,12 @@ import { IUser } from "../models/User.js";
 
 declare global {
     namespace Express {
+        interface User extends Partial<IUser>, Partial<JwtPayload> {
+            role: "student" | "admin";
+        }
+
         interface Request {
-            user?: JwtPayload | IUser;
+            user?: User;
         }
     }
 }

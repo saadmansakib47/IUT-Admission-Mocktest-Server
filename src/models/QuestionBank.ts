@@ -1,3 +1,4 @@
+//QuestionBank model
 import { Schema, model } from "mongoose";
 
 
