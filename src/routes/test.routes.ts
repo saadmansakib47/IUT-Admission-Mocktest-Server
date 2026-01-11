@@ -7,5 +7,5 @@ export const testRouter = Router();
 
 
 testRouter.post("/start", authMiddleware, startTestHandler);
-testRouter.post("/:testSessionId/answer", authMiddleware, answerQuestionHandler);
+testRouter.patch("/:testSessionId/answer", authMiddleware, answerQuestionHandler);
 testRouter.post("/:testSessionId/submit", authMiddleware, submitTestHandler);

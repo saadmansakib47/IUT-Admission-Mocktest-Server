@@ -15,22 +15,47 @@ export const startTestHandler = async (req, res) => {
         }))
     });
 };
+export const answerQuestionHandler = async (req, res) => {
+    const { testSessionId } = req.params;
+    const { questionId, selectedAnswer } = req.body;
+    const user = req.user;
+    const userId = user?.userId || user?._id?.toString();
+    if (!userId) {
+        return res.status(401).json({ message: "User identity required" });
+    }
+    const session = await TestSession.findById(testSessionId);
+    if (!session)
+        return res.status(404).json({ message: "Test session not found" });
+    if (!session.userId || session.userId.toString() !== userId.toString())
+        return res.status(403).json({ message: "Not your test session" });
+    if (session.status !== "active") {
+        return res.status(400).json({ message: "Cannot answer a submitted test" });
+    }
+    // find question in session
+    const questionIndex = session.questions.findIndex(q => q.questionId.toString() === questionId);
+    if (questionIndex === -1) {
+        return res.status(404).json({ message: "Question not found in this session" });
+    }
+    // update selectedAnswer
+    session.questions[questionIndex].selectedAnswer = selectedAnswer;
+    await session.save();
+    res.json({ message: "Answer saved" });
+};
 export const submitTestHandler = async (req, res) => {
     const { testSessionId } = req.params;
-    const session = await TestSession.findById(testSessionId);
-    //Invalid test session
+    const session = await TestSession.findById(testSessionId).populate("questions.questionId");
     if (!session) {
         return res.status(404).json({ message: "Test session not found" });
     }
     // Auto-submit on timeout
     if (!session.submittedAt && session.endsAt && new Date() > session.endsAt) {
-        const score = await submitTest(testSessionId);
-        return res.json({ score, total: 100, autoSubmitted: true });
+        const score = await submitTest(testSessionId); // autoSubmit = true
+        return res.json({ score, total: session.questions.length, autoSubmitted: true });
     }
-    //Already submitted tests
+    // Already submitted
     if (session.submittedAt) {
         return res.status(400).json({ message: "Test already submitted" });
     }
     const score = await submitTest(testSessionId);
-    res.json({ score, total: 100, autoSubmitted: false });
+    res.json({ score, total: session.questions.length, autoSubmitted: false });
 };

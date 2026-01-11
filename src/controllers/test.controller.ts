@@ -28,12 +28,17 @@ export const startTestHandler = async (req: Request, res: Response) => {
 export const answerQuestionHandler = async (req: Request, res: Response) => {
     const { testSessionId } = req.params;
     const { questionId, selectedAnswer } = req.body;
-    const userId = (req.user as any)._id;
+    const user = req.user as any;
+    const userId = user?.userId || user?._id?.toString();
+
+    if (!userId) {
+        return res.status(401).json({ message: "User identity required" });
+    }
 
     const session = await TestSession.findById(testSessionId);
     if (!session) return res.status(404).json({ message: "Test session not found" });
 
-    if (session.userId.toString() !== userId.toString())
+    if (!session.userId || session.userId.toString() !== userId.toString())
         return res.status(403).json({ message: "Not your test session" });
 
     if (session.status !== "active") {
