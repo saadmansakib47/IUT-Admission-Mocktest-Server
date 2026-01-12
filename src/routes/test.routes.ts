@@ -3,6 +3,7 @@ import { answerQuestionHandler, startTestHandler, submitTestHandler } from "../c
 import { authMiddleware } from "../middlewares/auth.middleware.js";
 import { RateLimiter } from "../middlewares/rateLimit.middleware.js";
 import { testHistoryHandler } from "../controllers/testHistory.controller.js";
+import { testReviewHandler } from "../controllers/testReview.controller.js";
 
 export const testRouter = Router();
 
@@ -11,3 +12,4 @@ testRouter.post("/start", authMiddleware, startTestHandler);
 testRouter.patch("/:testSessionId/answer", authMiddleware, answerQuestionHandler);
 testRouter.post("/:testSessionId/submit", authMiddleware, RateLimiter, submitTestHandler);
 testRouter.get("/history", authMiddleware, testHistoryHandler);
+testRouter.get("/history/:testSessionId", authMiddleware, testReviewHandler);
