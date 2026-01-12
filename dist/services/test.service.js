@@ -31,17 +31,20 @@ export const startTest = async (userId, questionBankId) => {
     });
     return { session, questions };
 };
-export const submitTest = async (sessionId) => {
+export const submitTest = async (sessionId, autoSubmit = false) => {
     const session = await TestSession.findById(sessionId).populate("questions.questionId");
     if (!session || session.submittedAt)
         throw new Error("Invalid session");
     let score = 0;
     session.questions.forEach((q) => {
-        if (q.selectedAnswer === q.questionId.correctAnswer)
+        const isCorrect = q.selectedAnswer === q.questionId.correctAnswer;
+        q.correct = isCorrect;
+        if (isCorrect)
             score++;
     });
     session.score = score;
     session.submittedAt = new Date();
+    session.status = autoSubmit ? "auto-submitted" : "submitted";
     await session.save();
     return score;
 };

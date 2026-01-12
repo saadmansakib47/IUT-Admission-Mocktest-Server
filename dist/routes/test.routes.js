@@ -1,7 +1,10 @@
 import { Router } from "express";
 import { answerQuestionHandler, startTestHandler, submitTestHandler } from "../controllers/test.controller.js";
 import { authMiddleware } from "../middlewares/auth.middleware.js";
+import { RateLimiter } from "../middlewares/rateLimit.middleware.js";
+import { testHistoryHandler } from "../controllers/testHistory.controller.js";
 export const testRouter = Router();
 testRouter.post("/start", authMiddleware, startTestHandler);
 testRouter.patch("/:testSessionId/answer", authMiddleware, answerQuestionHandler);
-testRouter.post("/:testSessionId/submit", authMiddleware, submitTestHandler);
+testRouter.post("/:testSessionId/submit", authMiddleware, RateLimiter, submitTestHandler);
+testRouter.get("/history", authMiddleware, testHistoryHandler);

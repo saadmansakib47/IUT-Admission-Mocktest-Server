@@ -49,7 +49,7 @@ export const submitTestHandler = async (req, res) => {
     }
     // Auto-submit on timeout
     if (!session.submittedAt && session.endsAt && new Date() > session.endsAt) {
-        const score = await submitTest(testSessionId); // autoSubmit = true
+        const score = await submitTest(testSessionId, true); // autoSubmit = true
         return res.json({ score, total: session.questions.length, autoSubmitted: true });
     }
     // Already submitted

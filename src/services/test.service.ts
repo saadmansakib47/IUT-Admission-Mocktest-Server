@@ -46,19 +46,23 @@ export const startTest = async (userId: string | null, questionBankId: string) =
 };
 
 
-export const submitTest = async (sessionId: string) => {
+export const submitTest = async (sessionId: string, autoSubmit: boolean = false) => {
     const session = await TestSession.findById(sessionId).populate("questions.questionId");
     if (!session || session.submittedAt) throw new Error("Invalid session");
 
 
     let score = 0;
     session.questions.forEach((q: any) => {
-        if (q.selectedAnswer === q.questionId.correctAnswer) score++;
+        const isCorrect = q.selectedAnswer === q.questionId.correctAnswer;
+        q.correct = isCorrect;
+        if (isCorrect) score++;
     });
 
 
     session.score = score;
     session.submittedAt = new Date();
+    session.status = autoSubmit ? "auto-submitted" : "submitted";
+
     await session.save();
 
 
