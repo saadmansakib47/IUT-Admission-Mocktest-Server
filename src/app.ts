@@ -14,7 +14,7 @@ import aiRoutes from "./routes/ai.routes.js";
 const corsOptions = {
     origin: process.env.FRONTEND_URL || "http://localhost:3000", // Specific origin, not *
     credentials: true, // Allow cookies
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     optionsSuccessStatus: 200,
 };
