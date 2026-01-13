@@ -39,10 +39,16 @@ export const submitTest = async (sessionId, autoSubmit = false) => {
     session.questions.forEach((q) => {
         const isCorrect = q.selectedAnswer === q.questionId.correctAnswer;
         q.correct = isCorrect;
-        if (isCorrect)
-            score++;
+        if (isCorrect) {
+            score += 1;
+        }
+        else if (q.selectedAnswer !== null && q.selectedAnswer !== undefined) {
+            // Negative marking: -0.25 for incorrect answer (not null)
+            score -= 0.25;
+        }
     });
-    session.score = score;
+    // Ensure score doesn't go below 0
+    session.score = Math.max(0, score);
     session.submittedAt = new Date();
     session.status = autoSubmit ? "auto-submitted" : "submitted";
     await session.save();
