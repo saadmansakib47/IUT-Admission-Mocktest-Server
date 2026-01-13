@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { buildTestAnalysisPayload } from "../services/testAnalysisBuilder.service.js";
-import { getAIAnalysis } from "../services/ai.service.js";
+import { getCachedTestAnalysis } from "../services/aiAnalysis.service.js";
 
 export const aiTestAnalysisHandler = async (req: Request, res: Response) => {
     try {
@@ -17,7 +17,7 @@ export const aiTestAnalysisHandler = async (req: Request, res: Response) => {
             testSessionId
         );
 
-        const aiResponse = await getAIAnalysis(analysisPayload);
+        const aiResponse = await getCachedTestAnalysis(testSessionId, analysisPayload);
 
         res.json({
             analysis: aiResponse

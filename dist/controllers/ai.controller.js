@@ -1,5 +1,5 @@
 import { buildTestAnalysisPayload } from "../services/testAnalysisBuilder.service.js";
-import { getAIAnalysis } from "../services/ai.service.js";
+import { getCachedTestAnalysis } from "../services/aiAnalysis.service.js";
 export const aiTestAnalysisHandler = async (req, res) => {
     try {
         const user = req.user;
@@ -9,7 +9,7 @@ export const aiTestAnalysisHandler = async (req, res) => {
             return res.status(401).json({ message: "Authentication required" });
         }
         const analysisPayload = await buildTestAnalysisPayload(userId, testSessionId);
-        const aiResponse = await getAIAnalysis(analysisPayload);
+        const aiResponse = await getCachedTestAnalysis(testSessionId, analysisPayload);
         res.json({
             analysis: aiResponse
         });
