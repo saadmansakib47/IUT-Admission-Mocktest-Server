@@ -35,3 +35,49 @@ Please analyze:
     const data = await response.json();
     return data.choices[0].message.content;
 };
+export const getAIQuestionExplanation = async (payload) => {
+    const response = await fetch(OPENROUTER_URL, {
+        method: "POST",
+        headers: {
+            "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            model: "meta-llama/llama-3-8b-instruct",
+            messages: [
+                {
+                    role: "system",
+                    content: "You are an experienced university admission tutor. Explain MCQ answers clearly with exam-focused guidance."
+                },
+                {
+                    role: "user",
+                    content: `
+Question (Subject: ${payload.subject}):
+
+"${payload.stem}"
+
+Options:
+${payload.options
+                        .map((opt, i) => `${String.fromCharCode(65 + i)}) ${opt}`)
+                        .join("\n")}
+
+Correct Answer:
+${payload.correctAnswer}
+
+Student's Answer:
+${payload.selectedAnswer ?? "Not answered"}
+
+Please:
+1. Explain why the correct answer is correct
+2. Explain why the student's answer is wrong or missing
+3. Identify the topic involved
+4. Give 1–2 exam-focused tips
+`
+                }
+            ],
+            temperature: 0.6
+        })
+    });
+    const data = await response.json();
+    return data.choices[0].message.content;
+};

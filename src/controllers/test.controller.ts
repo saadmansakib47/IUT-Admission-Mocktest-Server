@@ -1,7 +1,39 @@
-//Test Controller
 import { Request, Response } from "express";
 import { startTest, submitTest } from "../services/test.service.js";
 import { TestSession } from "../models/TestSession.js";
+
+export const getTestSessionHandler = async (req: Request, res: Response) => {
+    try {
+        const { testSessionId } = req.params;
+        const user = req.user as any;
+        const userId = user?.userId || user?._id?.toString();
+
+        const session = await TestSession.findById(testSessionId).populate("questions.questionId");
+        if (!session) return res.status(404).json({ message: "Test session not found" });
+
+        if (session.userId?.toString() !== userId?.toString()) {
+            return res.status(403).json({ message: "Not your test session" });
+        }
+
+        if (session.status !== "active") {
+            return res.status(400).json({ message: "Test already submitted, use history to view results" });
+        }
+
+        res.json({
+            testSessionId: session._id,
+            endsAt: session.endsAt,
+            status: session.status,
+            questions: (session.questions as any[]).map(q => ({
+                questionId: q.questionId._id,
+                stem: q.questionId.stem,
+                options: q.questionId.options,
+                selectedAnswer: q.selectedAnswer
+            }))
+        });
+    } catch (error: any) {
+        res.status(500).json({ message: error.message });
+    }
+};
 
 
 export const startTestHandler = async (req: Request, res: Response) => {

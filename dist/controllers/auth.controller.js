@@ -1,9 +1,10 @@
 import * as AuthService from "../services/auth.service.js";
 import { verifyRefreshToken } from "../utils/jwt.js";
+const isProduction = process.env.NODE_ENV === "production";
 const cookieOptions = {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
 };
 export const signup = async (req, res) => {
     const { email, password } = req.body;
@@ -39,8 +40,8 @@ export const googleOAuthCallback = async (req, res) => {
         // Use AuthService.generateTokens for consistency (hashes refreshToken in DB)
         const { accessToken, refreshToken } = await AuthService.generateTokens(userId, user.role || "student");
         // set cookies
-        res.cookie("accessToken", accessToken, { ...cookieOptions, sameSite: "none", secure: true });
-        res.cookie("refreshToken", refreshToken, { ...cookieOptions, sameSite: "none", secure: true });
+        res.cookie("accessToken", accessToken, cookieOptions);
+        res.cookie("refreshToken", refreshToken, cookieOptions);
         // redirect to frontend
         const redirectUrl = process.env.FRONTEND_URL ? `${process.env.FRONTEND_URL}/dashboard` : "http://localhost:3000/dashboard";
         res.redirect(redirectUrl);
@@ -67,8 +68,8 @@ export const logout = async (req, res) => {
         }
     }
     res
-        .clearCookie("accessToken")
-        .clearCookie("refreshToken")
+        .clearCookie("accessToken", cookieOptions)
+        .clearCookie("refreshToken", cookieOptions)
         .sendStatus(200);
 };
 export const forgotPassword = async (req, res) => {
