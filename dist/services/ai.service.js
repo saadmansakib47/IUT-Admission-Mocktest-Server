@@ -81,3 +81,66 @@ Please:
     const data = await response.json();
     return data.choices[0].message.content;
 };
+export const getAICoachInsights = async (tests) => {
+    const response = await fetch(OPENROUTER_URL, {
+        method: "POST",
+        headers: {
+            "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            model: "meta-llama/llama-3-8b-instruct",
+            messages: [
+                {
+                    role: "system",
+                    content: "You are an AI academic coach. Analyze student mock tests and provide brief, punchy insights."
+                },
+                {
+                    role: "user",
+                    content: `
+You are given up to 5 recent mock test attempts by a student.
+Each test has: title, score, totalMarks, timeTaken, submittedAt.
+
+Your task:
+- Generate EXACTLY 3 short insights (2–3 lines each)
+- Focus ONLY on trends:
+  - score improvement or decline
+  - time management patterns
+  - subject or consistency issues
+- DO NOT comment on every test
+- Be constructive and concise
+
+Each insight MUST include:
+- message
+- tag (one of: "critical", "warning", "on-track")
+
+Return ONLY valid JSON in this format:
+[
+  { "tag": "...", "message": "..." }
+]
+
+Tests:
+${JSON.stringify(tests, null, 2)}
+`
+                }
+            ],
+            temperature: 0.6
+        })
+    });
+    const data = await response.json();
+    const content = data.choices[0].message.content;
+    try {
+        // Strip out any markdown code blocks if the AI included them
+        const jsonContent = content.replace(/```json|```/g, "").trim();
+        return JSON.parse(jsonContent);
+    }
+    catch (error) {
+        console.error("Failed to parse AI coach insights:", error);
+        return [
+            {
+                tag: "warning",
+                message: "We're having trouble analyzing your recent performance. Try again later!"
+            }
+        ];
+    }
+};
