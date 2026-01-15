@@ -9,6 +9,7 @@ import { questionBankRouter } from "./routes/questionBank.routes.js";
 import adminQuestionRouter from "./routes/adminQuestion.routes.js";
 import { errorHandler } from "./middlewares/error.middleware.js";
 import aiRoutes from "./routes/ai.routes.js";
+import { httpLogger } from "./config/pino.js";
 // CORS configuration
 const corsOptions = {
     origin: process.env.FRONTEND_URL || "http://localhost:3000", // Specific origin, not *
@@ -30,4 +31,5 @@ app.use("/api/tests", testRouter);
 app.use("/api/admin/questions", adminQuestionRouter);
 app.use("/api/ai", aiRoutes);
 app.use(errorHandler);
+app.use(httpLogger);
 export default app;
