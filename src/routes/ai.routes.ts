@@ -2,6 +2,7 @@ import { Router } from "express";
 import { authMiddleware } from "../middlewares/auth.middleware.js";
 import { aiTestAnalysisHandler } from "../controllers/ai.controller.js";
 import { explainQuestionHandler } from "../controllers/aiExplanation.controller.js";
+import { getCoachInsightsHandler } from "../controllers/aiCoach.controller.js";
 
 const router = Router();
 
@@ -15,6 +16,12 @@ router.post(
     "/explain-question/:testSessionId/:questionId",
     authMiddleware,
     explainQuestionHandler
+);
+
+router.get(
+    "/coach-insights",
+    authMiddleware,
+    getCoachInsightsHandler
 );
 
 export default router;
