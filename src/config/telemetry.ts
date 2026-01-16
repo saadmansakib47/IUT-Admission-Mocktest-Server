@@ -3,8 +3,7 @@ import { getNodeAutoInstrumentations } from "@opentelemetry/auto-instrumentation
 import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-grpc";
 import { resourceFromAttributes } from "@opentelemetry/resources";
 import { SemanticResourceAttributes } from "@opentelemetry/semantic-conventions";
-import { PeriodicExportingMetricReader } from "@opentelemetry/sdk-metrics";
-import { OTLPMetricExporter } from "@opentelemetry/exporter-metrics-otlp-grpc";
+import { PrometheusExporter } from "@opentelemetry/exporter-prometheus";
 import { trace } from "@opentelemetry/api";
 
 
@@ -12,14 +11,10 @@ const traceExporter = new OTLPTraceExporter({
     url: "http://localhost:4317",
 });
 
-const metricExporter = new OTLPMetricExporter({
-    url: "http://localhost:9464/metrics",
-});
-
-
-const metricReader = new PeriodicExportingMetricReader({
-    exporter: metricExporter,
-    exportIntervalMillis: 10000,
+const metricReader = new PrometheusExporter({
+    port: 9464,
+}, () => {
+    console.log("OpenTelemetry initialized, Prometheus scrape endpoint: http://localhost:9464/metrics");
 });
 
 const sdk = new NodeSDK({
