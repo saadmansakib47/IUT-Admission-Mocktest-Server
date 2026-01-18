@@ -23,11 +23,21 @@ export const signup = async (req: Request, res: Response) => {
         user.role
     );
 
+    const username = user.email.split("@")[0];
+
     res
         .cookie("accessToken", accessToken, cookieOptions)
         .cookie("refreshToken", refreshToken, cookieOptions)
         .status(201)
-        .json({ message: "Signup successful" });
+        .json({
+            message: "Signup successful",
+            user: {
+                id: user.id,
+                username,
+                email: user.email,
+                role: user.role,
+            },
+        });
 };
 
 export const signin = async (req: Request, res: Response) => {
@@ -43,10 +53,20 @@ export const signin = async (req: Request, res: Response) => {
         user.role
     );
 
+    const username = user.email.split("@")[0];
+
     res
         .cookie("accessToken", accessToken, cookieOptions)
         .cookie("refreshToken", refreshToken, cookieOptions)
-        .json({ message: "Signin successful" });
+        .json({
+            message: "Signin successful",
+            user: {
+                id: user.id,
+                username,
+                email: user.email,
+                role: user.role,
+            },
+        });
 };
 
 
