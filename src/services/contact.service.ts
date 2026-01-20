@@ -15,3 +15,7 @@ export const createContactMessage = async (data: {
 
     return message;
 };
+
+export const getAllContactMessages = async (): Promise<IContactMessage[]> => {
+    return await ContactMessage.find().sort({ createdAt: -1 });
+};

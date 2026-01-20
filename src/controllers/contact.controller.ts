@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { createContactMessage } from "../services/contact.service.js";
+import { createContactMessage, getAllContactMessages } from "../services/contact.service.js";
 
 export const submitContactForm = async (req: Request, res: Response) => {
     try {
@@ -26,5 +26,15 @@ export const submitContactForm = async (req: Request, res: Response) => {
     } catch (error) {
         console.error("Contact submission error:", error);
         res.status(500).json({ message: "Something went wrong" });
+    }
+};
+
+export const getContactMessages = async (req: Request, res: Response) => {
+    try {
+        const messages = await getAllContactMessages();
+        res.status(200).json(messages);
+    } catch (error) {
+        console.error("Error fetching contact messages:", error);
+        res.status(500).json({ message: "Internal server error" });
     }
 };
