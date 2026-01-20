@@ -10,6 +10,16 @@ const cookieOptions = {
     sameSite: isProduction ? ("none" as const) : ("lax" as const),
 };
 
+const accessTokenCookieOptions = {
+    ...cookieOptions,
+    maxAge: 4 * 60 * 60 * 1000, // 4 hours
+};
+
+const refreshTokenCookieOptions = {
+    ...cookieOptions,
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+};
+
 export const signup = async (req: Request, res: Response) => {
     const { email, password } = req.body;
 
@@ -26,8 +36,8 @@ export const signup = async (req: Request, res: Response) => {
     const username = user.email.split("@")[0];
 
     res
-        .cookie("accessToken", accessToken, cookieOptions)
-        .cookie("refreshToken", refreshToken, cookieOptions)
+        .cookie("accessToken", accessToken, accessTokenCookieOptions)
+        .cookie("refreshToken", refreshToken, refreshTokenCookieOptions)
         .status(201)
         .json({
             message: "Signup successful",
@@ -56,8 +66,8 @@ export const signin = async (req: Request, res: Response) => {
     const username = user.email.split("@")[0];
 
     res
-        .cookie("accessToken", accessToken, cookieOptions)
-        .cookie("refreshToken", refreshToken, cookieOptions)
+        .cookie("accessToken", accessToken, accessTokenCookieOptions)
+        .cookie("refreshToken", refreshToken, refreshTokenCookieOptions)
         .json({
             message: "Signin successful",
             user: {
@@ -92,8 +102,8 @@ export const googleOAuthCallback = async (req: Request, res: Response) => {
         );
 
         // set cookies
-        res.cookie("accessToken", accessToken, cookieOptions);
-        res.cookie("refreshToken", refreshToken, cookieOptions);
+        res.cookie("accessToken", accessToken, accessTokenCookieOptions);
+        res.cookie("refreshToken", refreshToken, refreshTokenCookieOptions);
 
         // redirect to frontend
         const redirectUrl = process.env.FRONTEND_URL ? `${process.env.FRONTEND_URL}/dashboard` : "http://localhost:3000/dashboard";
@@ -116,7 +126,7 @@ export const refresh = async (req: Request, res: Response) => {
         refreshToken
     );
 
-    res.cookie("accessToken", newAccessToken, cookieOptions).sendStatus(200);
+    res.cookie("accessToken", newAccessToken, accessTokenCookieOptions).sendStatus(200);
 };
 
 export const logout = async (req: Request, res: Response) => {
