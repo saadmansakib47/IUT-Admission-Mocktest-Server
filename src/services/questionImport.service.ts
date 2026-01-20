@@ -80,6 +80,7 @@ export const importCSVQuestions = async (filePath: string) => {
             difficulty: row.difficulty,
             year: row.year ? Number(row.year) : undefined,
             source: row.source,
+            questionBankId: bank._id,
         });
 
         inserted++;

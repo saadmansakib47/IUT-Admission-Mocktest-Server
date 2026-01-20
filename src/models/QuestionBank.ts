@@ -1,8 +1,17 @@
-//QuestionBank model
-import { Schema, model } from "mongoose";
+import { Schema, model, Document } from "mongoose";
 
+export interface IQuestionBank extends Document {
+    title: string;
+    type: "prev_year" | "practice";
+    year?: number;
+    subjects: string[];
+    totalQuestions: number;
+    duration: number;
+    createdAt: Date;
+    updatedAt: Date;
+}
 
-const QuestionBankSchema = new Schema(
+const QuestionBankSchema = new Schema<IQuestionBank>(
     {
         title: { type: String, required: true },
         type: { type: String, enum: ["prev_year", "practice"], required: true },
@@ -14,5 +23,4 @@ const QuestionBankSchema = new Schema(
     { timestamps: true }
 );
 
-
-export const QuestionBank = model("QuestionBank", QuestionBankSchema);
+export const QuestionBank = model<IQuestionBank>("QuestionBank", QuestionBankSchema);
