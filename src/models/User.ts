@@ -9,6 +9,10 @@ export interface IUser extends Document {
     resetToken?: string;
     resetTokenExpiry?: Date;
     lastLoginAt?: Date;
+    name?: string;
+    location?: string;
+    bio?: string;
+    profilePicture?: string;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -39,6 +43,10 @@ const UserSchema = new Schema<IUser>(
         resetToken: String,
         resetTokenExpiry: Date,
         lastLoginAt: Date,
+        name: { type: String, trim: true },
+        location: { type: String, trim: true },
+        bio: { type: String, trim: true },
+        profilePicture: { type: String, trim: true },
     },
     { timestamps: true }
 );
