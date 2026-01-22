@@ -6,24 +6,50 @@ const cookieOptions = {
     secure: isProduction,
     sameSite: isProduction ? "none" : "lax",
 };
+const accessTokenCookieOptions = {
+    ...cookieOptions,
+    maxAge: 4 * 60 * 60 * 1000, // 4 hours
+};
+const refreshTokenCookieOptions = {
+    ...cookieOptions,
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+};
 export const signup = async (req, res) => {
     const { email, password } = req.body;
     const user = await AuthService.createUser(email.toLowerCase(), password);
     const { accessToken, refreshToken } = await AuthService.generateTokens(user.id, user.role);
+    const username = user.email.split("@")[0];
     res
-        .cookie("accessToken", accessToken, cookieOptions)
-        .cookie("refreshToken", refreshToken, cookieOptions)
+        .cookie("accessToken", accessToken, accessTokenCookieOptions)
+        .cookie("refreshToken", refreshToken, refreshTokenCookieOptions)
         .status(201)
-        .json({ message: "Signup successful" });
+        .json({
+        message: "Signup successful",
+        user: {
+            id: user.id,
+            username,
+            email: user.email,
+            role: user.role,
+        },
+    });
 };
 export const signin = async (req, res) => {
     const { email, password } = req.body;
     const user = await AuthService.authenticateUser(email.toLowerCase(), password);
     const { accessToken, refreshToken } = await AuthService.generateTokens(user.id, user.role);
+    const username = user.email.split("@")[0];
     res
-        .cookie("accessToken", accessToken, cookieOptions)
-        .cookie("refreshToken", refreshToken, cookieOptions)
-        .json({ message: "Signin successful" });
+        .cookie("accessToken", accessToken, accessTokenCookieOptions)
+        .cookie("refreshToken", refreshToken, refreshTokenCookieOptions)
+        .json({
+        message: "Signin successful",
+        user: {
+            id: user.id,
+            username,
+            email: user.email,
+            role: user.role,
+        },
+    });
 };
 export const googleOAuthCallback = async (req, res) => {
     try {
@@ -40,8 +66,8 @@ export const googleOAuthCallback = async (req, res) => {
         // Use AuthService.generateTokens for consistency (hashes refreshToken in DB)
         const { accessToken, refreshToken } = await AuthService.generateTokens(userId, user.role || "student");
         // set cookies
-        res.cookie("accessToken", accessToken, cookieOptions);
-        res.cookie("refreshToken", refreshToken, cookieOptions);
+        res.cookie("accessToken", accessToken, accessTokenCookieOptions);
+        res.cookie("refreshToken", refreshToken, refreshTokenCookieOptions);
         // redirect to frontend
         const redirectUrl = process.env.FRONTEND_URL ? `${process.env.FRONTEND_URL}/dashboard` : "http://localhost:3000/dashboard";
         res.redirect(redirectUrl);
@@ -57,7 +83,7 @@ export const refresh = async (req, res) => {
         return res.sendStatus(401);
     const payload = verifyRefreshToken(refreshToken);
     const newAccessToken = await AuthService.rotateRefreshToken(payload.userId, refreshToken);
-    res.cookie("accessToken", newAccessToken, cookieOptions).sendStatus(200);
+    res.cookie("accessToken", newAccessToken, accessTokenCookieOptions).sendStatus(200);
 };
 export const logout = async (req, res) => {
     if (req.user) {

@@ -24,5 +24,9 @@ const UserSchema = new Schema({
     resetToken: String,
     resetTokenExpiry: Date,
     lastLoginAt: Date,
+    name: { type: String, trim: true },
+    location: { type: String, trim: true },
+    bio: { type: String, trim: true },
+    profilePicture: { type: String, trim: true },
 }, { timestamps: true });
 export const User = mongoose.model("User", UserSchema);
