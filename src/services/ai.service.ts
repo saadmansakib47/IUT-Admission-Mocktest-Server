@@ -80,11 +80,10 @@ ${payload.correctAnswer}
 Student's Answer:
 ${payload.selectedAnswer ?? "Not answered"}
 
-Please:
-1. Explain why the correct answer is correct
-2. Explain why the student's answer is wrong or missing
-3. Identify the topic involved
-4. Give 1–2 exam-focused tips
+    Please provide a concise explanation (strictly 3–4 lines) that covers:
+    - Why the correct answer is right and why the student's answer (if any) is wrong.
+    - The core topic and 1 quick exam tip.
+    Keep it punchy and direct.
 `
                 }
             ],
