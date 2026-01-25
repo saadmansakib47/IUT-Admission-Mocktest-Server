@@ -18,12 +18,6 @@ router.post(
     explainQuestionHandler
 );
 
-// Main route
-router.get(
-    "/coach-insights",
-    authMiddleware,
-    getCoachInsightsHandler
-);
 
 // Alias for singular (frontend might be calling this)
 router.get(
