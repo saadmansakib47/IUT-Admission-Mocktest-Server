@@ -17,7 +17,20 @@ import { httpLogger } from "./config/pino.js";
 
 // CORS configuration
 const corsOptions = {
-    origin: process.env.FRONTEND_URL || "http://localhost:3000", // Specific origin, not *
+    origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+        const allowedOrigins = [
+            "http://localhost:3000",
+            "https://iut-test-prep.vercel.app",
+            process.env.FRONTEND_URL
+        ].filter(Boolean);
+
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            console.log("Blocked by CORS:", origin);
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     credentials: true, // Allow cookies
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization'],
