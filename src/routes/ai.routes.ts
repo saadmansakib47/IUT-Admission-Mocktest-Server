@@ -26,3 +26,5 @@ router.get(
     getCoachInsightsHandler
 );
 
+export default router;
+

@@ -6,5 +6,5 @@ import { getCoachInsightsHandler } from "../controllers/aiCoach.controller.js";
 const router = Router();
 router.post("/test-analysis/:testSessionId", authMiddleware, aiTestAnalysisHandler);
 router.post("/explain-question/:testSessionId/:questionId", authMiddleware, explainQuestionHandler);
-router.get("/coach-insights", authMiddleware, getCoachInsightsHandler);
-export default router;
+// Alias for singular (frontend might be calling this)
+router.get("/coach-insight", authMiddleware, getCoachInsightsHandler);

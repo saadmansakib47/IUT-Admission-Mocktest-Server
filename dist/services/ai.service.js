@@ -13,7 +13,7 @@ export const getAIAnalysis = async (analysisPayload) => {
             messages: [
                 {
                     role: "system",
-                    content: "You are an expert university admission mentor. Give actionable feedback."
+                    content: "You are an expert university admission mentor. Give actionable feedback. Do not use asterisks or markdown bold styling."
                 },
                 {
                     role: "user",
@@ -33,7 +33,7 @@ Please analyze:
         })
     });
     const data = await response.json();
-    return data.choices[0].message.content;
+    return data.choices[0].message.content.replace(/\*/g, "");
 };
 export const getAIQuestionExplanation = async (payload) => {
     const response = await fetch(OPENROUTER_URL, {
