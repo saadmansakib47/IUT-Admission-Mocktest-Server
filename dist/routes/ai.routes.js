@@ -8,3 +8,4 @@ router.post("/test-analysis/:testSessionId", authMiddleware, aiTestAnalysisHandl
 router.post("/explain-question/:testSessionId/:questionId", authMiddleware, explainQuestionHandler);
 // Alias for singular (frontend might be calling this)
 router.get("/coach-insight", authMiddleware, getCoachInsightsHandler);
+export default router;

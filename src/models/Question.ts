@@ -15,7 +15,7 @@ export interface IQuestion extends Document {
 
 const QuestionSchema = new Schema<IQuestion>(
     {
-        subject: { type: String, enum: ["phy", "chem", "math", "eng"], required: true },
+        subject: { type: String, enum: ["phy", "chem", "math", "eng", "english"], required: true },
         stem: { type: String, required: true },
         options: { type: [String], required: true },
         correctAnswer: { type: String, required: true },
