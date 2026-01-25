@@ -1,7 +1,7 @@
 import { Schema, model, Document, Types } from "mongoose";
 
 export interface IQuestion extends Document {
-    subject: "phy" | "chem" | "math" | "eng";
+    subject: "phy" | "chem" | "math" | "eng" | "physics" | "chemistry" | "mathematics" | "biology" | "english";
     stem: string;
     options: string[];
     correctAnswer: string;
@@ -15,7 +15,7 @@ export interface IQuestion extends Document {
 
 const QuestionSchema = new Schema<IQuestion>(
     {
-        subject: { type: String, enum: ["phy", "chem", "math", "eng", "english"], required: true },
+        subject: { type: String, enum: ["phy", "chem", "math", "eng", "physics", "chemistry", "mathematics", "biology", "english"], required: true },
         stem: { type: String, required: true },
         options: { type: [String], required: true },
         correctAnswer: { type: String, required: true },
