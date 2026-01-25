@@ -18,10 +18,17 @@ router.post(
     explainQuestionHandler
 );
 
+// Main route
 router.get(
     "/coach-insights",
     authMiddleware,
     getCoachInsightsHandler
 );
 
-export default router;
+// Alias for singular (frontend might be calling this)
+router.get(
+    "/coach-insight",
+    authMiddleware,
+    getCoachInsightsHandler
+);
+
