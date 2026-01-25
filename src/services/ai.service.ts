@@ -16,7 +16,7 @@ export const getAIAnalysis = async (analysisPayload: any) => {
                 {
                     role: "system",
                     content:
-                        "You are an expert university admission mentor. Give actionable feedback."
+                        "You are an expert university admission mentor. Give actionable feedback. Do not use asterisks or markdown bold styling."
                 },
                 {
                     role: "user",
@@ -37,7 +37,7 @@ Please analyze:
     });
 
     const data: any = await response.json();
-    return data.choices[0].message.content;
+    return data.choices[0].message.content.replace(/\*/g, "");
 };
 
 
