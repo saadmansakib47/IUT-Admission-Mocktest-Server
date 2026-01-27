@@ -24,10 +24,16 @@ export const generateCoachInsights = async (userId: string) => {
     // 1️⃣ Check cache
     const cached = await redis.get(cacheKey);
     if (cached) {
-        return {
-            cached: true,
-            insights: JSON.parse(cached)
-        };
+        const parsed = JSON.parse(cached);
+        // If the cached version is the fallback error, ignore it and refresh
+        const isFallback = Array.isArray(parsed) && parsed.length === 1 && parsed[0].message?.includes("trouble analyzing");
+
+        if (!isFallback) {
+            return {
+                cached: true,
+                insights: parsed
+            };
+        }
     }
 
     // 2️⃣ Fetch latest 5 submitted tests
@@ -70,14 +76,18 @@ export const generateCoachInsights = async (userId: string) => {
     // 4️⃣ Call AI
     const insights = await getAICoachInsights(aiInput);
 
-    // 5️⃣ Cache result
-    await redis.set(
-        cacheKey,
-        JSON.stringify(insights),
-        {
-            EX: 86400
-        }
-    );
+    // 5️⃣ Cache result (ONLY if it's not the fallback error message)
+    const isFallback = insights.length === 1 && insights[0].message.includes("trouble analyzing");
+
+    if (!isFallback) {
+        await redis.set(
+            cacheKey,
+            JSON.stringify(insights),
+            {
+                EX: 86400
+            }
+        );
+    }
 
     return {
         cached: false,

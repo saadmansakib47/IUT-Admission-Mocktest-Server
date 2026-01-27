@@ -97,22 +97,23 @@ ${payload.selectedAnswer ?? "Not answered"}
 
 
 export const getAICoachInsights = async (tests: any[]) => {
-    const response = await fetch(OPENROUTER_URL, {
-        method: "POST",
-        headers: {
-            "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            model: "meta-llama/llama-3-8b-instruct",
-            messages: [
-                {
-                    role: "system",
-                    content: "You are an AI academic coach. Analyze student mock tests and provide brief, punchy insights."
-                },
-                {
-                    role: "user",
-                    content: `
+    try {
+        const response = await fetch(OPENROUTER_URL, {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                model: "meta-llama/llama-3-8b-instruct",
+                messages: [
+                    {
+                        role: "system",
+                        content: "You are an AI academic coach. Analyze student mock tests and provide brief, punchy insights. Return ONLY a JSON array."
+                    },
+                    {
+                        role: "user",
+                        content: `
 You are given up to 5 recent mock test attempts by a student.
 Each test has: title, score, totalMarks, timeTaken, submittedAt.
 
@@ -137,21 +138,39 @@ Return ONLY valid JSON in this format:
 Tests:
 ${JSON.stringify(tests, null, 2)}
 `
-                }
-            ],
-            temperature: 0.6
-        })
-    });
+                    }
+                ],
+                temperature: 0.6
+            })
+        });
 
-    const data: any = await response.json();
-    const content = data.choices[0].message.content;
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error(`OpenRouter API error (${response.status}):`, errorText);
+            throw new Error(`AI API responded with status ${response.status}`);
+        }
 
-    try {
-        // Strip out any markdown code blocks if the AI included them
-        const jsonContent = content.replace(/```json|```/g, "").trim();
+        const data: any = await response.json();
+
+        if (!data.choices?.[0]?.message?.content) {
+            console.error("Malformed AI response data:", JSON.stringify(data));
+            throw new Error("Invalid response structure from AI API");
+        }
+
+        const content = data.choices[0].message.content;
+
+        // More robust JSON extraction: find the first '[' and last ']'
+        const jsonMatch = content.match(/\[[\s\S]*\]/);
+        if (!jsonMatch) {
+            console.error("Could not find JSON array in AI response:", content);
+            throw new Error("AI response did not contain a valid JSON array");
+        }
+
+        const jsonContent = jsonMatch[0];
         return JSON.parse(jsonContent);
+
     } catch (error) {
-        console.error("Failed to parse AI coach insights:", error);
+        console.error("Failed to fetch or parse AI coach insights:", error);
         return [
             {
                 tag: "warning",
