@@ -2,6 +2,8 @@ import { Types } from "mongoose";
 import redis from "../config/redis.js";
 import { TestSession } from "../models/TestSession.js";
 import { getAICoachInsights } from "./ai.service.js";
+import fs from "fs";
+import path from "path";
 
 interface IPopulatedTestSession {
     _id: Types.ObjectId;
@@ -26,7 +28,7 @@ export const generateCoachInsights = async (userId: string) => {
     if (cached) {
         const parsed = JSON.parse(cached);
         // If the cached version is the fallback error, ignore it and refresh
-        const isFallback = Array.isArray(parsed) && parsed.length === 1 && parsed[0].message?.includes("trouble analyzing");
+        const isFallback = Array.isArray(parsed) && parsed.length === 1 && parsed[0].type === "warning" && parsed[0].message?.includes("trouble analyzing");
 
         if (!isFallback) {
             return {
@@ -45,6 +47,8 @@ export const generateCoachInsights = async (userId: string) => {
         .limit(5)
         .populate("questionBankId", "title totalQuestions")
         .lean() as unknown as IPopulatedTestSession[];
+
+    fs.appendFileSync("debug_ai.log", `[${new Date().toISOString()}] User ${userId} - Sessions found: ${sessions.length}\n`);
 
     if (sessions.length < 2) {
         return {
@@ -73,11 +77,13 @@ export const generateCoachInsights = async (userId: string) => {
         };
     });
 
+    fs.appendFileSync("debug_ai.log", `[${new Date().toISOString()}] AI Input: ${JSON.stringify(aiInput)}\n`);
+
     // 4️⃣ Call AI
     const insights = await getAICoachInsights(aiInput);
 
     // 5️⃣ Cache result (ONLY if it's not the fallback error message)
-    const isFallback = insights.length === 1 && insights[0].message.includes("trouble analyzing");
+    const isFallback = insights.length === 1 && insights[0].type === "warning" && insights[0].message.includes("trouble analyzing");
 
     if (!isFallback) {
         await redis.set(

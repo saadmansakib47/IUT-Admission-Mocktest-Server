@@ -173,7 +173,7 @@ ${JSON.stringify(tests, null, 2)}
         console.error("Failed to fetch or parse AI coach insights:", error);
         return [
             {
-                tag: "warning",
+                type: "warning",
                 message: "We're having trouble analyzing your recent performance. Try again later!"
             }
         ];
