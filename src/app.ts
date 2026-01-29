@@ -13,6 +13,8 @@ import adminUserRouter from "./routes/adminUser.routes.js";
 import userRouter from "./routes/user.routes.js";
 import { errorHandler } from "./middlewares/error.middleware.js";
 import aiRoutes from "./routes/ai.routes.js";
+import faqRoutes from "./routes/faq.routes.js";
+import studyTipRoutes from "./routes/studyTip.routes.js";
 import { httpLogger } from "./config/pino.js";
 
 // CORS configuration
@@ -56,6 +58,8 @@ app.use("/api/admin/stats", adminStatsRouter);
 app.use("/api/admin/users", adminUserRouter);
 app.use("/api/user", userRouter);
 app.use("/api/ai", aiRoutes);
+app.use("/api/faqs", faqRoutes);
+app.use("/api/study-tips", studyTipRoutes);
 
 app.use(errorHandler);
 app.use(httpLogger);
